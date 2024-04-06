@@ -1,8 +1,9 @@
-import styles from "./Home.module.css";
+import { useState, useEffect } from "react";
 import styled from "styled-components";
-import { tweets } from "../../utils/tweets";
+import CreatePostForm from "../CreatePostFrom/";
 import Tweet from "../Tweet";
-import CreatePostFrom from "../CreatePostFrom";
+import styles from "./Home.module.css";
+import { fetchTweets } from "../../utils/getTweets";
 
 const Feed = styled.div`
   max-width: 42rem;
@@ -13,18 +14,57 @@ const Feed = styled.div`
 `;
 
 export default function Home() {
+  const [tweets, setTweets] = useState([]);
+
+  const fetchData = async () => {
+    const response = await fetchTweets();
+    setTweets(response);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <main className={styles.home}>
-      <Feed className="w-2 border-x border-slate-400">
+      <Feed>
         <div className="border-b border-slate-400 p-4">
-          <CreatePostFrom />
+          <CreatePostForm postTweet={setTweets} />
         </div>
         <div className="flex flex-col">
-          {tweets.map((tweet) => (
-            <Tweet key={tweet.id} tweet={tweet} />
-          ))}
+          {tweets.length ? (
+            tweets.map((tweet) => <Tweet key={tweet.id} tweet={tweet} />)
+          ) : (
+            <div>Loading...</div>
+          )}
         </div>
       </Feed>
     </main>
   );
 }
+
+// const BadStopWatch = () => {
+//   const [time, setTime] = useState(0);
+//   useEffect(() => {
+//     setInterval(() => setTime((p) => p + 0.1), 100);
+//   }, []);
+
+//   return (
+//     <div className="m-2">
+//       <p>BadStopWatch : {time.toFixed(1)}</p>
+//     </div>
+//   );
+// };
+// const GoodStopWatch = () => {
+//   const [time, setTime] = useState(0);
+//   useEffect(() => {
+//     const intervalId = setInterval(() => setTime((p) => p + 0.1), 100);
+//     return () => clearInterval(intervalId);
+//   }, []);
+
+//   return (
+//     <div className="m-2">
+//       <p>GoodStopWatch : {time.toFixed(1)}</p>
+//     </div>
+//   );
+// };
